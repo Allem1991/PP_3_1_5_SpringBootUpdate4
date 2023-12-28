@@ -87,7 +87,7 @@ public class AdminController {
             StringBuilder errorMessage = new StringBuilder();
             List<FieldError> errors = bindingResult.getFieldErrors();
             for (FieldError error: errors) {
-                errorMessage.append(error.getField()).append(" - ").append(error.getDefaultMessage()).append(";");
+                errorMessage.append(error.getDefaultMessage()).append("; ");
             }
             throw new UserNotValidException(errorMessage.toString());
         }

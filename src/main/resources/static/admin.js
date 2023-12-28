@@ -55,6 +55,10 @@ fillRoles("role_select")
 
 document.getElementById('newUserForm').addEventListener('submit', (e) => {
     e.preventDefault()
+
+    document.getElementById('createUserErrors').style.display = 'none';
+    document.getElementById('createUserErrors').innerHTML = '';
+
     let role = document.getElementById('role_select')
     let rolesAddUser = []
     let rolesAddUserValue = ''
@@ -78,7 +82,14 @@ document.getElementById('newUserForm').addEventListener('submit', (e) => {
             roles: rolesAddUser
         })
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message);
+                });
+            }
+            return response.json();
+        })
         .then(user => {
             let newRow = document.createElement('tr')
             newRow.innerHTML = `<tr>
@@ -94,9 +105,14 @@ document.getElementById('newUserForm').addEventListener('submit', (e) => {
                            </tr>`
             document.getElementById("users-info-table").appendChild(newRow)
             document.getElementById('newUserForm').reset()
-
+            document.getElementById("all-users-tab").click()
         })
-    document.getElementById("all-users-tab").click()
+        .catch(error => {
+            // Отображаем сообщение об ошибке
+            document.getElementById('createUserErrors').innerHTML = 'Error creating user: ' + error.message;
+            document.getElementById('createUserErrors').style.display = 'block';
+        });
+    // document.getElementById("all-users-tab").click()
 })
 
 const idEdit = document.getElementById('id_edit')
@@ -131,6 +147,10 @@ on(document, 'click', '#editUserBtn', e => {
 
 document.getElementById('edit_user_form').addEventListener('submit', (e) => {
     e.preventDefault()
+
+    document.getElementById('editUserErrors').style.display = 'none';
+    document.getElementById('editUserErrors').innerHTML = '';
+
     let role = document.getElementById('role_edit')
     let rolesUserEdit = []
     let rolesUserEditValue = ''
@@ -155,15 +175,28 @@ document.getElementById('edit_user_form').addEventListener('submit', (e) => {
             roles: rolesUserEdit
         })
     })
-        .then(response => response.json())
-        .catch(error => console.log(error))
-    rowEdit.children[0].innerHTML = idEdit.value
-    rowEdit.children[1].innerHTML = nameEdit.value
-    rowEdit.children[2].innerHTML = lastnameEdit.value
-    rowEdit.children[3].innerHTML = ageEdit.value
-    rowEdit.children[4].innerHTML = emailEdit.value
-    rowEdit.children[5].innerHTML = rolesUserEditValue
-    editUserModal.hide()
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message);
+                });
+            }
+            return response.json();
+        })
+        .then(user => {
+            rowEdit.children[0].innerHTML = idEdit.value;
+            rowEdit.children[1].innerHTML = nameEdit.value;
+            rowEdit.children[2].innerHTML = lastnameEdit.value;
+            rowEdit.children[3].innerHTML = ageEdit.value;
+            rowEdit.children[4].innerHTML = emailEdit.value;
+            rowEdit.children[5].innerHTML = rolesUserEditValue;
+            editUserModal.hide();
+        })
+        .catch(error => {
+            // Отображаем сообщение об ошибке
+            document.getElementById('editUserErrors').innerHTML = 'Error updating user: ' + error.message;
+            document.getElementById('editUserErrors').style.display = 'block';
+        });
 })
 
 let rowDelete = null
